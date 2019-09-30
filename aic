@@ -2,6 +2,24 @@
 set -x
 
 IMAGE_TAG=latest
+DOCKER_HUB_USER=mikeanthony
+C_AIC_MANAGER_NAME=aic-manager
+C_AIC_ANDROID_NAME=android
+
+if [ ! -z "$DOCKER_HUB_USER" ]; then
+    DH_AIC_MANAGER_NAME="${DOCKER_HUB_USER}/${C_AIC_MANAGER_NAME}"
+    DH_AIC_ANDROID_NAME="${DOCKER_HUB_USER}/${C_AIC_ANDROID_NAME}"
+else
+    DH_AIC_MANAGER_NAME="${C_AIC_MANAGER_NAME}"
+    DH_AIC_ANDROID_NAME="${C_AIC_ANDROID_NAME}"
+fi
+if [ ! -z "$IMAGE_TAG" ]; then
+    TAG_AIC_MANAGER_IMAGE="$DH_AIC_MANAGER_NAME:$IMAGE_TAG"
+    TAG_AIC_ANDROID_IMAGE="$DH_AIC_ANDROID_NAME:$IMAGE_TAG"
+else
+    TAG_AIC_MANAGER_IMAGE="$DH_AIC_MANAGER_NAME"
+    TAG_AIC_ANDROID_IMAGE="$DH_AIC_ANDROID_NAME"
+fi  
 
 function check_num {
     case $1 in
@@ -34,12 +52,12 @@ function check_kernel_header {
 }
 
 function check_containers {
-    if [ -z "$($DOCKER ps -a | awk '{print $NF}' | grep -w aic-manager)" ]; then
-        echo "[AIC] mikeanthony/aic-manager container not existed, please re-install aic!"
+    if [ -z "$($DOCKER ps -a | awk '{print $NF}' | grep -w $C_AIC_MANAGER_NAME)" ]; then
+        echo "[AIC] $C_AIC_MANAGER_NAME container not existed, please re-install aic!"
         exit -1
     fi
-    if [ -z "$($DOCKER ps -a | awk '{print $NF}' | grep android)" ]; then
-        echo "[AIC] android container does not exist, please re-install aic!"
+    if [ -z "$($DOCKER ps -a | awk '{print $NF}' | grep $C_AIC_ANDROID_NAME)" ]; then
+        echo "[AIC] $C_AIC_ANDROID_NAME container does not exist, please re-install aic!"
         exit -1
     fi
 }
@@ -507,19 +525,6 @@ function install {
         fi
     fi
 
-    # AIC_MANAGER_IMAGE_FILE=aic-manager.tar.gz
-    # ANDROID_IMAGE_FILE=android.tar.gz
-    AIC_MANAGER_IMAGE=mikeanthony/aic-manager
-    ANDROID_IMAGE=mikeanthony/android
-	
-    if [ ! -z "$IMAGE_TAG" ]; then
-        AIC_MANAGER_IMAGE="mikeanthony/aic-manager:$IMAGE_TAG"
-        ANDROID_IMAGE="mikeanthony/android:$IMAGE_TAG"
-    fi
-    # if [ ! -e "$AIC_MANAGER_IMAGE_FILE" ] || [ ! -e "$ANDROID_IMAGE_FILE" ]; then
-        # echo "[AIC] Missing Android or aic-manager docker image files, plese check you installation!"
-        # exit -1
-    # fi
     if [ "$ANDROID_UPDATE" = "true" ]; then
         if [ ! -e "./update/Dockerfile" ] || [ ! -d "./update/root" ]; then
             echo "[AIC] Missing docker sources(./update/Dockerfile or ./update/root) to do android image update!"
@@ -536,10 +541,11 @@ function install {
     fi
 
     # uninstall previous resources
-    #if [ ! -z "$($DOCKER ps -a | grep -E 'android|aic-manager')" ] || [ ! -z "$($DOCKER images | grep -E 'android|aic-manager')" ]; then
-        #echo "[AIC] Uninstall existing resources first..."
-        #uninstall
-    #fi
+    if [ ! -z "$($DOCKER ps -a | grep -E 'android|aic-manager')" ] || [ ! -z "$($DOCKER images | grep -E 'android|aic-manager')" ]; then
+        echo "[AIC] Uninstall existing resources first..."
+        uninstall
+    fi
+
 
     # set up server running environment if needed.
     if [ "$PLATFORM_HARDWARE" = "server" ]; then
@@ -560,15 +566,13 @@ function install {
 
     # load docker images
     echo "[AIC] Load images..."
-    #$DOCKER load -i $AIC_MANAGER_IMAGE_FILE
-    #$DOCKER load -i $ANDROID_IMAGE_FILE
-    $DOCKER pull mikeanthony/aic-manager:latest
-    $DOCKER pull mikeanthony/android:latest
-	
+    $DOCKER pull $TAG_AIC_MANAGER_IMAGE
+    $DOCKER pull $TAG_AIC_ANDROID_IMAGE
+
     if [ "$ANDROID_UPDATE" = "true" ]; then
-        $DOCKER tag $ANDROID_IMAGE android_base
-        $DOCKER rmi $ANDROID_IMAGE
-        $DOCKER build -t $ANDROID_IMAGE update
+        $DOCKER tag $TAG_AIC_ANDROID_IMAGE android_base
+        $DOCKER rmi $TAG_AIC_ANDROID_IMAGE
+        $DOCKER build -t $TAG_AIC_ANDROID_IMAGE update
     fi
 
     # create aic-manager container
@@ -616,7 +620,7 @@ function install {
     fi
 
     echo "[AIC] create aic-manager container..."
-    $DOCKER container create --name aic-manager --init --net host --privileged=true $AIC_MANAGER_CONTAINER_OPTION $AIC_MANAGER_IMAGE $AIC_MANAGER_CONTAINER_CMDS
+    $DOCKER container create --name $C_AIC_MANAGER_NAME --init --net host --privileged=true $AIC_MANAGER_CONTAINER_OPTION $TAG_AIC_MANAGER_IMAGE $AIC_MANAGER_CONTAINER_CMDS
 
     # create Android containers
     ANDROID_CONTAINER_OPTION="-v $APP_DIR:/oem/app:ro -v $WORK_DIR/ipc:/ipc -v /dev/binderfs:/binderfs:rw -v /dev/bus/usb:/dev/bus/usb"
@@ -668,7 +672,7 @@ function install {
             ANDROID_CONTAINER_OPTION="$ANDROID_CONTAINER_OPTION --net android --ip $IP --mac-address $MAC -p $(($ADB_PORT+i)):5555 -v $WORK_DIR/ipc/config/ethernet/$i:/data/misc/ethernet"
         fi
 
-        $DOCKER container create --name android$i --cpuset-cpus=$CPU_SET --privileged=true $ANDROID_CONTAINER_OPTION $ANDROID_IMAGE $ANDROID_CONTAINER_CMDS $i
+        $DOCKER container create --name android$i --cpuset-cpus=$CPU_SET --privileged=true $ANDROID_CONTAINER_OPTION $TAG_AIC_ANDROID_IMAGE $ANDROID_CONTAINER_CMDS $i
     done
 }
 
@@ -695,13 +699,6 @@ function uninstall {
         $DOCKER stop -t0 $CONTAINERS
         echo "[AIC] rm containers..."
         $DOCKER rm $CONTAINERS
-    fi
-
-    # rm images
-    IMAGES=$($DOCKER images | grep -E 'android|aic-manager' | awk '{print $3}')
-    if [ ! -z "$IMAGES" ]; then
-        echo "[AIC] rm images..."
-        $DOCKER rmi $IMAGES
     fi
 
     # remove docker network
