@@ -248,32 +248,6 @@ function increase_limits() {
     sudo su - root -c 'echo "1000" > /sys/kernel/mm/ksm/pages_to_scan'
 }
 
-function mount_binderfs() {
-    if [ ! -d "/dev/binderfs" ]; then
-        echo "Create binderfs mount point /dev/binderfs..."
-        sudo mkdir -p /dev/binderfs
-    fi
-    umount_binderfs
-
-    while [ -z "$(grep -e "binderfs_module" /proc/modules)" ]
-    do
-        echo "[AIC] Waiting for binderfs module installed..."
-        sleep 1
-    done
-
-    sudo mount -t binder binder /dev/binderfs
-}
-
-function umount_binderfs() {
-    if [[ $(findmnt "/dev/binderfs") ]]; then
-        echo "Umount binderfs..."
-        find /dev/binderfs/*binder*[0-9] 2> /dev/null | while read line; do
-            sudo unlink $line
-        done
-        sudo umount /dev/binderfs
-    fi
-}
-
 SYSTEM_IMAGE_MOUNT_OPTIONS=
 function get_system_image_mount_options() {
     images=$($DOCKER run --rm -it --entrypoint /bin/sh $AIC_MANAGER_IMAGE -c '[ -d /images ] && cd /images && ls *.img' | tr -d '\r')
@@ -709,9 +683,6 @@ function uninstall {
 
     # umount FUSE mount point if any
     umount_fuse_folder
-
-    # umount binderfs mount point if any
-    umount_binderfs
 }
 
 function start {
@@ -794,7 +765,6 @@ function start {
             xhost +local:$($DOCKER inspect --format='{{ .Config.Hostname }}' aic-manager) > /dev/null 2>&1
         fi
         $DOCKER start aic-manager
-        mount_binderfs
     fi
 
     EXISTED_CONTAINERS=$($DOCKER ps -a | awk '{print $NF}' | grep android)
@@ -878,8 +848,6 @@ function stop {
         $DOCKER stop aic-manager
         # umount FUSE mount point if any
         umount_fuse_folder
-        # umount binderfs mount point if any
-        umount_binderfs
     fi
 }
 

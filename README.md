@@ -14,6 +14,10 @@ git clone https://github.com/mikeanthony1/aic.git
 #This only needs to be run once
 ./config.sh
 
+#kernel module stuff
+mkdir -p /dev/binderfs
+mount -t binder binder /dev/binderfs
+
 #Download Android containers 
 ./aic.sh install
 
