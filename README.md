@@ -23,3 +23,18 @@ docker-compose up
 #Bring down
 docker-compose down
 ```
+
+Running subsequent times (after reboot)
+
+```
+#Run these commands to initialize x11 and binder
+mkdir -p /dev/binderfs
+mount -t binder binder /dev/binderfs
+xhost +
+
+#Start up
+docker-compose up
+
+#Bring down
+docker-compose down
+```

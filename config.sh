@@ -32,10 +32,8 @@ else
 	echo "Skipping ashmem/binder installation"
 fi
 
-if [ ! -d /dev/binderfs ]; then
-	mkdir -p /dev/binderfs
-	mount -t binder binder /dev/binderfs
-fi
+mkdir -p /dev/binderfs
+mount -t binder binder /dev/binderfs
 
  
 #Get official Docker GPG key
