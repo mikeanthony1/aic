@@ -24,6 +24,7 @@ if ! lsmod | grep ashmem; then
  
 	#Install kernel modules
 	make -C ashmem -j `nproc` install
+	insmod ashmem/ashmem_module.ko
 	make -C binder -j `nproc` install
 	depmod
 	printf "\nashmem_module\nbinder_module\nbinderfs_module\n" >> /etc/modules
