@@ -249,7 +249,7 @@ function increase_limits() {
 
 SYSTEM_IMAGE_MOUNT_OPTIONS=
 function get_system_image_mount_options() {
-    images=$($DOCKER run --rm -it --entrypoint /bin/sh $AIC_MANAGER_IMAGE -c '[ -d /images ] && cd /images && ls *.img' | tr -d '\r')
+    images=$($DOCKER run --rm -it --entrypoint /bin/sh $TAG_AIC_MANAGER_IMAGE -c '[ -d /images ] && cd /images && ls *.img' | tr -d '\r')
     if [ -n "$images" ]; then
         mountd=$(pwd)/workdir/media
         echo "[AIC] system images: $images"
@@ -764,8 +764,10 @@ function start {
             xhost +local:$($DOCKER inspect --format='{{ .Config.Hostname }}' aic-manager) > /dev/null 2>&1
         fi
         $DOCKER start aic-manager
-        mkdir -p /dev/binderfs
-        mount -t binder binder /dev/binderfs
+	if [ ! -d /dev/binderfs ]; then
+		mkdir -p /dev/binderfs
+		mount -t binder binder /dev/binderfs
+	fi
     fi
 
     EXISTED_CONTAINERS=$($DOCKER ps -a | awk '{print $NF}' | grep android)
