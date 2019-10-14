@@ -58,15 +58,3 @@ else
 	echo "Skipping docker-compose install"
 fi
 
-CPU_PATH="$(pwd)/workdir/cpu"
-if [ ! -d $CPU_PATH ]; then
-	echo "Making cpu path at: $CPU_PATH"
-	mkdir -p $CPU_PATH
-fi
-
-APP_DIR="$(pwd)/workdir/app/installed"
-if [ ! -d $APP_DIR ]; then
-	echo "Making cpu path at: $APP_DIR"
-	mkdir -p $APP_DIR
-fi
-
