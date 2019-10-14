@@ -764,6 +764,8 @@ function start {
             xhost +local:$($DOCKER inspect --format='{{ .Config.Hostname }}' aic-manager) > /dev/null 2>&1
         fi
         $DOCKER start aic-manager
+        mkdir -p /dev/binderfs
+        mount -t binder binder /dev/binderfs
     fi
 
     EXISTED_CONTAINERS=$($DOCKER ps -a | awk '{print $NF}' | grep android)
