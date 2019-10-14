@@ -14,9 +14,12 @@ git clone https://github.com/mikeanthony1/aic.git
 #This only needs to be run once
 ./config.sh
 
-#Download Android containers 
-./aic.sh install
+#Configure x11 to accept connection from AIC
+xhost +
 
-#Start Android containers
-./aic.sh start
+#Start up
+docker-compose up
+
+#Bring down
+docker-compose down
 ```

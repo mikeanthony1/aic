@@ -29,8 +29,14 @@ if ! lsmod | grep ashmem; then
 	depmod
 	printf "\nashmem_module\nbinder_module\nbinderfs_module\n" >> /etc/modules
 else
-	 echo "Skipping ashmem/binder installation"
+	echo "Skipping ashmem/binder installation"
 fi
+
+if [ ! -d /dev/binderfs ]; then
+	mkdir -p /dev/binderfs
+	mount -t binder binder /dev/binderfs
+fi
+
  
 #Get official Docker GPG key
 if ! hash docker 2> /dev/null; then
@@ -58,4 +64,13 @@ if ! hash docker-compose 2> /dev/null; then
 else
 	echo "Skipping docker-compose install"
 fi
+
+#Replacing ./aic install functions
+WORK_DIR="$(pwd)/workdir"
+APP_DIR="$WORK_DIR/app/installed"
+CPU_DIR="$(pwd)/workdir/cpu/"
+
+mkdir -p $WORK_DIR
+mkdir -p $APP_DIR
+mkdir -p $CPU_DIR
 

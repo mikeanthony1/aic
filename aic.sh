@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 IMAGE_TAG=latest
 DOCKER_HUB_USER=mikeanthony
