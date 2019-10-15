@@ -2,7 +2,7 @@ version: '3'
 services:
   aic-manager:
     network_mode: host
-    command: -d x11
+    command: -n 1 -d x11
     privileged: true
     image: "mikeanthony/aic-manager:latest"
     volumes:
@@ -14,6 +14,8 @@ services:
   android0:
     image: "mikeanthony/android:latest"
     privileged: true
+    depends_on:
+      - aic-manager
     command: "0"
     ports:
       - "5555:5555"
@@ -22,12 +24,21 @@ services:
       android:
         ipv4_address: 172.100.0.2
     volumes:
-      - ./workdir/ipc/config/ethernet/0:/data/misc/ethernet
       - ./workdir/app/installed:/oem/app:ro
       - ./workdir/ipc:/ipc
       - /dev/binderfs:/binderfs:rw
       - /dev/bus/usb:/dev/bus/usb
+      - ./workdir/media/docker:/docker:ro
+      - ./workdir/media/run:/run:ro
+      - ./workdir/media/sh:/sh:ro
+      - ./workdir/media/aic-manager:/aic-manager:ro
+      - ./workdir/ipc/config/ethernet/0:/data/misc/ethernet
       - ./workdir/data0:/data
+      - ./workdir/media/&&:/&&:ro
+      - ./workdir/media/cd:/cd:ro 
+      - ./workdir/media/images:/images:ro 
+      - ./workdir/media/ls:/ls:ro 
+      - ./workdir/media/*:/*:ro
   portainer:
     image: portainer/portainer
     command: -H unix:///var/run/docker.sock
@@ -44,6 +55,9 @@ volumes:
 
 networks:
   android:
+    labels:
+      - "com.docker.network.bridge.name=br-android"
+      - "com.docker.network.bridge.enable_icc=true"
     driver: bridge
     ipam:
       config:
