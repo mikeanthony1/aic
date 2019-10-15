@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #Install dependencies
-apt install -y make gcc wget unzip curl
+apt install -y make gcc wget unzip curl android-tools-adb android-tools-fastboot
  
 #Download Source
 FILE=master.zip
