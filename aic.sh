@@ -757,17 +757,16 @@ function start {
         fi
     done
     # Detected ended
-
+    
+    mkdir -p /dev/binderfs
+    mount -t binder binder /dev/binderfs
+	
     if [ -z "$($DOCKER ps | awk '{print $NF}' | grep -w aic-manager)" ]; then
         if [ "$OS_TYPE" = "ubuntu" ]; then
             export DISPLAY=:0
             xhost +local:$($DOCKER inspect --format='{{ .Config.Hostname }}' aic-manager) > /dev/null 2>&1
         fi
-        $DOCKER start aic-manager
-	if [ ! -d /dev/binderfs ]; then
-		mkdir -p /dev/binderfs
-		mount -t binder binder /dev/binderfs
-	fi
+        $DOCKER start aic-manager	
     fi
 
     EXISTED_CONTAINERS=$($DOCKER ps -a | awk '{print $NF}' | grep android)
