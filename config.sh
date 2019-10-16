@@ -12,7 +12,7 @@ if [ ! -f "$FILE" ]; then
 fi
  
 #TODO Ugly checking... improve
-if ! lsmod | grep ashmem > /dev/null; then
+if ! lsmod | grep ashmem_module > /dev/null; then
 	#Make kernel modules
 	cd kernel-modules-cic-master
 	make -C ashmem -j `nproc`
