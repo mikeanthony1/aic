@@ -10,8 +10,8 @@ if [ ! -f "$FILE" ]; then
 	unzip $FILE
 fi
  
-#TODO Ugly checking... improve
-if ! lsmod | grep ashmem; then
+#TODO Still ugly need to improve... 
+if ! lsmod | grep ashmem_module; then
 	#Make kernel modules
 	cd kernel-modules-cic-master
 	make -C ashmem -j `nproc`
