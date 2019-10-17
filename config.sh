@@ -33,10 +33,6 @@ else
 	echo "Skipping ashmem/binder installation"
 fi
 
-mkdir -p /dev/binderfs
-mount -t binder binder /dev/binderfs
-
- 
 #Get official Docker GPG key
 if ! hash docker 2> /dev/null; then
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -63,13 +59,4 @@ if ! hash docker-compose 2> /dev/null; then
 else
 	echo "Skipping docker-compose install"
 fi
-
-#Replacing ./aic install functions
-WORK_DIR="$(pwd)/workdir"
-APP_DIR="$WORK_DIR/app/installed"
-CPU_DIR="$(pwd)/workdir/cpu/"
-
-mkdir -p $WORK_DIR
-mkdir -p $APP_DIR
-mkdir -p $CPU_DIR
 

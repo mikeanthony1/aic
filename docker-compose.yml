@@ -28,17 +28,8 @@ services:
       - ./workdir/ipc:/ipc
       - /dev/binderfs:/binderfs:rw
       - /dev/bus/usb:/dev/bus/usb
-      - ./workdir/media/docker:/docker:ro
-      - ./workdir/media/run:/run:ro
-      - ./workdir/media/sh:/sh:ro
-      - ./workdir/media/aic-manager:/aic-manager:ro
       - ./workdir/ipc/config/ethernet/0:/data/misc/ethernet
       - ./workdir/data0:/data
-      - ./workdir/media/&&:/&&:ro
-      - ./workdir/media/cd:/cd:ro 
-      - ./workdir/media/images:/images:ro 
-      - ./workdir/media/ls:/ls:ro 
-      - ./workdir/media/*:/*:ro
   portainer:
     image: portainer/portainer
     command: -H unix:///var/run/docker.sock

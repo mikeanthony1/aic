@@ -1,5 +1,6 @@
 Recommended to execute on clean native install of Ubuntu 18.04/19.04
 
+OS Setup
 ```
 #Dependencies
 sudo su
@@ -12,31 +13,16 @@ cd aic
 
 #Configure OS 
 #Install ashmem/binder kernel modules
-#Install Docker
-#This only needs to be run once
+#Install docker/docker-compose
 ./config.sh
-
-#Configure x11 to accept connection from AIC
-xhost +
-
-#Start up
-docker-compose up
-
-#Bring down
-docker-compose down
 ```
 
-Running subsequent times (after reboot)
-
+AIC run commands
 ```
-#Run these commands to initialize x11 and binder
-mkdir -p /dev/binderfs
-mount -t binder binder /dev/binderfs
-xhost +
+#Start AIC
+#Logs will automatically display on terminal
+./aic-compose.sh
 
-#Start up
-docker-compose up
-
-#Bring down
+#Stop AIC
 docker-compose down
 ```
