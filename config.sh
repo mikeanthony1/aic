@@ -36,23 +36,13 @@ else
 	echo "Skipping ashmem/binder installation"
 fi
 
-#Get official Docker GPG key
+#Install Docker
 if ! hash docker 2> /dev/null; then
-	if cat /etc/issue | grep -q "19.10"; then 
-		PATH=$PATH:/snap/bin
-		snap install docker
+	#Leaving open for other Linux Distros
+	if cat /etc/issue | grep -q "Ubuntu"; then 
+		apt install -y docker.io
 	else
-		curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
-		#Add Docker repo to apt resources and update package database
-		add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
-		apt-get update
-
-		#This step can be used to check all previous steps worked
-		apt-cache policy docker-ce
-
-		#Install Docker
-		apt-get install -y docker-ce
+		echo "This script does not support installing Docker on this Linux Distro"
 	fi
 else
 	echo "Skipping Docker Install"
