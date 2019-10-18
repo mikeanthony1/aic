@@ -5,7 +5,7 @@ index b4ac7d8..f86e68f 100644
 @@ -1,4 +1,5 @@
 -ccflags-y += -I$(src) -Wno-int-conversion -Wno-error=incompatible-pointer-types  -DCONFIG_ANDROID_BINDER_DEVICES="\"hostbinder,hostvndbinder,hosthwbinder\"" -DCONFIG_ANDROID_BINDERFS
 +#ccflags-y += -I$(src) -Wno-int-conversion -Wno-error=incompatible-pointer-types  -DCONFIG_ANDROID_BINDER_DEVICES="\"hostbinder,hostvndbinder,hosthwbinder\"" -DCONFIG_ANDROID_BINDERFS
-+ccflags-y += -I$(src) -Wno-int-conversion  -Wno-implicit-function-declaration -DCONFIG_ANDROID_BINDER_DEVICES="\"hostbinder,hostvndbinder,hosthwbinder\"" -DCONFIG_ANDROID_BINDERFS
++ccflags-y += -I$(src) -Wno-int-conversion -Wno-error=incompatible-pointer-types -Wno-implicit-function-declaration -DCONFIG_ANDROID_BINDER_DEVICES="\"hostbinder,hostvndbinder,hosthwbinder\"" -DCONFIG_ANDROID_BINDERFS
  obj-m := binderfs_module.o binder_module.o
  binder_module-y := deps.o binder.o binder_alloc.o
  binderfs_module-y := deps.o binderfs.o

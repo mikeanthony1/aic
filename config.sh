@@ -12,12 +12,15 @@ if [ ! -f "$FILE" ]; then
 fi
  
 #TODO Ugly checking... improve
-if ! lsmod | grep ashmem_module > /dev/null; then
+if ! lsmod | grep binder_module > /dev/null; then
 	#Make kernel modules
 	cd kernel-modules-cic-master
 	make -C ashmem -j `nproc`
-	make -C binder -j `nproc`
 
+	if cat /etc/issue | grep -q "19.10"; then 
+		patch -p1 < ../binder-fix.patch
+	fi
+	make -C binder -j `nproc`
  
 	#Create library destination
 	export DESTDIR=/lib/modules/`uname -r`/extra
@@ -35,17 +38,22 @@ fi
 
 #Get official Docker GPG key
 if ! hash docker 2> /dev/null; then
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	if cat /etc/issue | grep -q "19.10"; then 
+		PATH=$PATH:/snap/bin
+		snap install docker
+	else
+		curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-	#Add Docker repo to apt resources and update package database
-	add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
-	apt-get update
+		#Add Docker repo to apt resources and update package database
+		add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
+		apt-get update
 
-	#This step can be used to check all previous steps worked
-	apt-cache policy docker-ce
+		#This step can be used to check all previous steps worked
+		apt-cache policy docker-ce
 
-	#Install Docker
-	apt-get install -y docker-ce
+		#Install Docker
+		apt-get install -y docker-ce
+	fi
 else
 	echo "Skipping Docker Install"
 fi
