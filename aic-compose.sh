@@ -1,8 +1,19 @@
 #!/bin/sh
 
+function umount_binderfs() {
+    if [[ $(findmnt "/dev/binderfs") ]]; then
+        echo "Umount binderfs..."
+        find /dev/binderfs/*binder*[0-9] 2> /dev/null | while read line; do
+            sudo unlink $line
+        done
+        sudo umount /dev/binderfs
+    fi
+}
+
 #binder setup
-mkdir -p /dev/binderfs
-mount -t binder binder /dev/binderfs
+umount_binderfs
+sudo mkdir -p /dev/binderfs
+sudo mount -t binder binder /dev/binderfs
 
 #working directories
 WORK_DIR="$(pwd)/workdir"
@@ -17,7 +28,7 @@ mkdir -p $IPC_DIR
 
 xhost +
 
-docker-compose up -d
+sudo docker-compose up -d
 
 echo "aic started!"
 echo "It safe to press CTRL+C at any time to stop following logs"
