@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 function umount_binderfs() {
     if [[ $(findmnt "/dev/binderfs") ]]; then
@@ -33,5 +33,5 @@ sudo docker-compose up -d
 echo "aic started!"
 echo "It safe to press CTRL+C at any time to stop following logs"
 sleep 1
-docker-compose logs -f
+sudo docker-compose logs -f
 

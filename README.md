@@ -1,15 +1,15 @@
-Recommended to execute on clean native install of Ubuntu 18.04/19.04
+Recommended to execute on clean native install of Ubuntu 18.04/19.04/19.10
+- Always tested with secure boot disabled in the BIOS
 
 OS Setup
 ```
 #Dependencies
-sudo su
-cd
-apt install -y git
+sudo apt install -y git
 
 #Download source
 git clone https://github.com/mikeanthony1/aic.git
 cd aic
+git checkout -t origin/dev
 
 #Configure OS 
 #Install ashmem/binder kernel modules
@@ -24,5 +24,5 @@ AIC run commands
 ./aic-compose.sh
 
 #Stop AIC
-docker-compose down
+sudo docker-compose down
 ```
