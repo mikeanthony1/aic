@@ -10,6 +10,9 @@ if [ ! -f "$FILE" ]; then
 	wget https://github.com/projectceladon/kernel-modules-cic/archive/master.zip
 	unzip $FILE
 fi
+
+sudo rmmod ashmem_linux
+sudo rmmod binder_linux
  
 #TODO Ugly checking... improve
 if ! lsmod | grep binder_module > /dev/null; then
@@ -27,11 +30,11 @@ if ! lsmod | grep binder_module > /dev/null; then
 	sudo mkdir -p $DESTDIR
  
 	#Install kernel modules
-	sudo make -C ashmem -j `nproc` install
+	sudo DESTDIR=$DESTDIR make -C ashmem -j `nproc` install
 	sudo insmod ashmem/ashmem_module.ko
-	sudo make -C binder -j `nproc` install
+	sudo DESTDIR=$DESTDIR make -C binder -j `nproc` install
 	sudo depmod
-	sudo printf "\nashmem_module\nbinder_module\nbinderfs_module\n" >> /etc/modules
+	sudo sh -c "printf \"\nashmem_module\nbinder_module\nbinderfs_module\n\" >> /etc/modules"
 else
 	echo "Skipping ashmem/binder installation"
 fi
