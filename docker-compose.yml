@@ -2,7 +2,8 @@ version: '3'
 services:
   aic-manager:
     network_mode: host
-    command: -n 1 -d x11
+    restart: always
+    command: -m -n 1 -d drm
     privileged: true
     image: "mikeanthony/aic-manager:latest"
     volumes:
@@ -17,6 +18,7 @@ services:
     depends_on:
       - aic-manager
     command: "0"
+    restart: always
     ports:
       - "5555:5555"
     mac_address: 8a:ca:58:b9:e9:51
@@ -28,6 +30,7 @@ services:
       - ./workdir/ipc:/ipc
       - /dev/binderfs:/binderfs:rw
       - /dev/bus/usb:/dev/bus/usb
+      - /dev/usb:/data/misc/usb:rw
       - ./workdir/ipc/config/ethernet/0:/data/misc/ethernet
       - ./workdir/data0:/data
   portainer:

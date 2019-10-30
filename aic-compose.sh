@@ -16,7 +16,9 @@ sudo mkdir -p /dev/binderfs
 sudo mount -t binder binder /dev/binderfs
 
 #working directories
-WORK_DIR="$(pwd)/workdir"
+#WORK_DIR="$(pwd)/workdir"
+WORK_DIR="/var/aic/workdir"
+
 APP_DIR="$WORK_DIR/app/installed"
 CPU_DIR="$WORK_DIR/cpu/"
 IPC_DIR="$WORK_DIR/ipc/config/input"
@@ -26,12 +28,12 @@ mkdir -p $APP_DIR
 mkdir -p $CPU_DIR
 mkdir -p $IPC_DIR
 
-xhost +
+#xhost +
 
-sudo docker-compose up -d
+sudo docker-compose -f /var/aic/docker-compose.yml up -d
 
-echo "aic started!"
-echo "It safe to press CTRL+C at any time to stop following logs"
-sleep 1
-sudo docker-compose logs -f
+#echo "aic started!"
+#echo "It safe to press CTRL+C at any time to stop following logs"
+#sleep 1
+#sudo docker-compose logs -f
 
