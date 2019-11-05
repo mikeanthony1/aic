@@ -1,4 +1,4 @@
-Recommended to execute on clean native install of Ubuntu 18.04/19.04
+Recommended to execute on clean native install of Ubuntu 18.04
 
 ```
 #Dependencies
